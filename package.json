@@ -4,7 +4,7 @@
     "description": "Node.js Role Based Authorization API",
     "license": "MIT",
     "scripts": {
-        "start": "nodemon ./server.js"
+        "start": "node server.js"
     },
     "dependencies": {
         "@hapi/hapi": "^18.3.2",
