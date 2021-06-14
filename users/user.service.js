@@ -14,7 +14,8 @@ module.exports = {
     getById
 };
 
-async function authenticate({ email, password }) {
+async function authenticate(req) {
+    const { email, password } = req.body;
     const user = users.find(u => u.email === email && u.password === password);
     if (user) {
         const token = jwt.sign({ sub: user.id, role: user.role }, config.secret);

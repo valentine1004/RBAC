@@ -1,34 +1,29 @@
-﻿require('rootpath')();
-const express = require('express');
+﻿const express = require('express');
 const app = express();
+const dotenv = require('dotenv');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
+const mongoose = require('mongoose');
+// routes
+const usersRoutes = require('./routes/users');
 
-const errorHandler = require('_helpers/error-handler');
+dotenv.config();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// connect to DB
+const url = process.env.ENVIRONMENT === 'qa' ? process.env.DB_LINK : 'mongodb://localhost:27017/water_admin';
+mongoose.connect(url, {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+}, () => console.log('connected to DB'));
+
 app.use(cors());
+app.use(express.json());
 
-// api routes
-app.use('/users', require('./users/users.controller'));
+app.use('/users', usersRoutes);
 
-// global error handler
-app.use(errorHandler);
-
-// Connection URL
-const url = 'mongodb://localhost:27017/water_admin';
-
-// Use connect method to connect to the Server
-MongoClient.connect(url, { useUnifiedTopology: true }, function(err, client) {
-    assert.equal(null, err);
-    client.close();
+app.listen(4000, () => {
+    console.log('server is running')
 });
 
-// start server
-const port = process.env.NODE_ENV === 'production' ? 80 : 4000;
-const server = app.listen(port, function () {
-    console.log('Server listening on port ' + port);
-});
+
+
