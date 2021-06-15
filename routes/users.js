@@ -74,9 +74,10 @@ router.post('/login', async (req, res) => {
     );
 });
 
-/* GET home page. */
-router.get('/', function(req, res) {
-    res.render('index', { title: 'Water admin app' });
+router.get('/', async (req, res) => {
+    User.find({}, (err, users) => {
+        res.send(users);
+    });
 });
 
 module.exports = router;

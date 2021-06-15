@@ -9,7 +9,7 @@ const usersRoutes = require('./routes/users');
 dotenv.config();
 
 // connect to DB
-const url = process.env.ENVIRONMENT === 'qa' ? process.env.DB_LINK : 'mongodb://localhost:27017/water_admin';
+const url = process.env.ENVIRONMENT === 'dev' ? process.env.DB_LINK : 'mongodb://localhost:27017/water_admin';
 mongoose.connect(url, {
     useNewUrlParser: true,
     useFindAndModify: false,
