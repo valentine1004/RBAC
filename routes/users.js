@@ -4,6 +4,12 @@ const jwt = require('jsonwebtoken');
 // const bcrypt = require('bcryptjs');
 const {registerValidation, loginValidation} = require('../validation');
 
+const usersAccess = {
+    'superuser': ['admin', 'content_manager'],
+    'admin': ['content_manager'],
+    'content_manager': []
+}
+
 // router.post('/register', async (req, res) => {
 //
 //     const {error} = registerValidation(req.body);
@@ -57,6 +63,9 @@ router.post('/login', async (req, res) => {
 
     const user = await User.findOne({email: req.body.email});
     if (!user) return res.status(400).send('Email is not found');
+    if (user.isBlocked) {
+        return res.status(400).send('Your account is blocked');
+    }
 
     // const validPass = await bcrypt.compare(req.body.password, user.password);
     // if (!validPass) return res.status(400).send('Invalid password');
@@ -68,15 +77,42 @@ router.post('/login', async (req, res) => {
             user: {
                 id: user._id,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                name: user.name,
+
             }
         }
     );
 });
 
-router.get('/', async (req, res) => {
-    User.find({}, (err, users) => {
+router.post('/', async (req, res) => {
+    User.create(req.body, (err, user) => {
+        res.send(user);
+    });
+});
+
+router.post('/available', async (req, res) => {
+    const currentUser = await User.findOne({_id: req.body.id});
+    User.find({role: {$in: usersAccess[currentUser.role]}}, (err, users) => {
         res.send(users);
+    });
+});
+
+router.get('/:id', async (req, res) => {
+    User.find({_id: req.params.id}, (err, user) => {
+        res.send(user);
+    });
+});
+
+router.put('/:id', async (req, res) => {
+    User.updateOne({_id: req.params.id}, req.body, (err, user) => {
+        res.send(user);
+    });
+});
+
+router.delete('/:id', async (req, res) => {
+    User.deleteOne({_id: req.params.id}, (err, user) => {
+        res.send(user);
     });
 });
 

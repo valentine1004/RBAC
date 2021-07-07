@@ -15,6 +15,16 @@ const usersSchema = new mongoose.Schema({
     role: {
         type: String,
         require: true
+    },
+    name: {
+        type: String,
+        require: true,
+        min: 6,
+        max: 1024
+    },
+    isBlocked: {
+        type: Boolean,
+        require: true
     }
 });
 
