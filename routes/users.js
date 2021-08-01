@@ -61,10 +61,10 @@ router.post('/login', async (req, res) => {
     const {error} = loginValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const user = await User.findOne({email: req.body.email});
-    if (!user) return res.status(400).send('Email is not found');
+    const user = await User.findOne({email: req.body.email, password: req.body.password});
+    if (!user) return res.status(401).send({message: 'Email or password is incorrect'});
     if (user.isBlocked) {
-        return res.status(400).send('Your account is blocked');
+        return res.status(401).send({message: 'Your account is blocked'});
     }
 
     // const validPass = await bcrypt.compare(req.body.password, user.password);
@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
 
     // create token
     // const token = jwt.sign({_id: user._id}, "test");
-    res.send(
+    res.status(200).send(
         {
             user: {
                 id: user._id,
